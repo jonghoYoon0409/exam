@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hk.board.mapper.patientMapper">
+	
+	<insert id="addPatient" parameterType="PatientDto">
+		INSERT INTO patientlist (patientid, patientname, diagnosis, admissiondate, guardianname, specialnotes,memberid)
+    VALUES (#{patientId}, #{patientName}, #{diagnosis}, #{admissionDate}, #{guardianName}, #{specialNotes}, #{memberid})
+</insert>
+	
+	
+	 <select id="idChk" parameterType="String" resultType="String">
+		SELECT ID FROM MEMBER WHERE ID = #{patientid}
+	</select>
+	
+	<select id="patientlist" parameterType="Map" resultType="PatientDto">
+		SELECT patientid, patientname, diagnosis, admissiondate, guardianname, specialnotes,memberid
+		FROM patientlist
+		WHERE memberid = #{memberid}
+	</select>
+	
+	
+<!--	
+	<select id="loginUser" parameterType="String" resultType="memberDto">
+		SELECT MEMBERID, ID, NAME, PASSWORD, EMAIL, ADDRESS, ROLE
+		FROM MEMBER
+		WHERE ID = #{id}
+	</select> -->
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

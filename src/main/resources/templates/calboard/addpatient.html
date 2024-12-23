@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+// click(), change().... 
+// on(), bind().... 이벤트 핸들러 함수
+ $(function(){
+		// on("eventType",funciton(){})
+		$("input[name=id]").on("keyup",function(){
+			var id=$(this).val();// id입력박스에 입력한 id값가져오기 value-> val()
+// 			console.log(id);
+			$.ajax({
+				url:"/user/idChk",
+				method:"get",
+				dataType:"json",
+				async:false,
+				data:{"id":id},
+				success:function(data){
+					if(data.id!=null){ // 사용할 수 없는 id
+// 						console.log("사용못함");
+						$("#idChk").attr("class","n")
+								   .css("color","red")
+						           .text("사용할 수 없는 아이디입니다.");
+					
+					}else{ //사용할 수 있는 id
+// 						console.log("사용함");
+						$("#idChk").attr("class","y")
+									.css("color","red")
+								   .text("사용 가능한 아이디입니다.");
+					}
+				},
+				error:function(e){
+					alert("통신오류:"+e);
+				}
+			});
+		});
+	}); 
+	
+	//중복된 아이디로 submit할 경우 처리
+	function submitChk(){
+		var classValue=$("#idChk").attr("class");
+		if(classValue=="n"){
+			alert("아이디를 확인하세요");
+			return false;
+		}
+		return true;
+	} 
+</script>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+<div layout:fragment="content">
+<div id="container">
+<h1>환자 등록</h1>
+	<form  action="/patient/addpatient" method="post" th:object="${AddPatientCommand}">
+		<input type="hidden" name="memberid" th:value="${session.mdto.memberid}" />
+		<table class="table">
+			<tr>
+				<th>환자 고유식별 번호:</th>
+				<td><input th:field="*{patient_id}" type="number" 
+				              class="form-control" name="patient_id" />
+				    <span id="idChk" class="n"></span>          
+					<span th:if="${#fields.hasErrors('patient_id')}" 
+					      th:errors="*{patient_id}" class="errorField"></span>
+				</td>
+			</tr>
+			<tr>
+				<th>환자 이름:</th>
+				<td><input th:field="*{patient_name}" type="text" 
+				              class="form-control" name="patient_name" />
+					<span th:if="${#fields.hasErrors('patient_name')}" 
+					      th:errors="*{patient_name}" class="errorField"></span>
+				</td>
+			</tr>
+			<tr>
+				<th>환자 병명:</th>
+				<td><input th:field="*{diagnosis}" type="text" 
+				              class="form-control" name="diagnosis" />
+					<span th:if="${#fields.hasErrors('diagnosis')}" 
+					      th:errors="*{diagnosis}" class="errorField"></span>
+				</td>
+			</tr>
+			<tr>
+				<th>입원 날짜</th>
+				<td><input th:field="*{admission_date}" type="DATE" 
+				              class="form-control" name="admission_date" />
+					<span th:if="${#fields.hasErrors('admission_date')}" 
+					      th:errors="*{admission_date}" class="errorField"></span>
+				</td>
+			</tr>
+			<tr>
+				<th>보호자명:</th>
+				<td><input th:field="*{guardian_name}" type="text" 
+				              class="form-control" name="guardian_name" />
+					<span th:if="${#fields.hasErrors('guardian_name')}" 
+					      th:errors="*{guardian_name}" class="errorField"></span>
+				</td>
+			</tr>
+			<tr>
+				<th>특이사항:</th>
+				<td><input th:field="*{special_notes}" type="text" 
+				              class="form-control" name="special_notes" />
+					<span th:if="${#fields.hasErrors('special_notes')}" 
+					      th:errors="*{special_notes}" class="errorField"></span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="submit" value="등록" class="btn"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+	</div>
+</div>
+</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <title>환자 추가</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <h1>환자 추가</h1>
+    <form action="#" th:action="@{/patient/add}" method="post">
+        폼 필드 추가
+        <input type="text" name="patientName" placeholder="환자 이름" required/>
+        <button type="submit">환자 추가</button>
+    </form>
+</body>
+</html> -->
+

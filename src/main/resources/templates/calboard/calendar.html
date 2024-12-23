@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+<head>
+<meta charset="UTF-8">
+<title>환자면담관리</title>
+<script type="text/javascript">
+	$(function(){
+		$(".d").hover(function(){
+			var aDate = $(this);
+			var year = $(".y").text().trim();
+			var month = $(".m").text().trim();
+			var date = aDate.text().trim();
+			var yyyyMMdd = year + (month.length < 2 ? "0" + month : month) + (date.length < 2 ? "0" + date : date);
+			console.log(yyyyMMdd);
+			$.ajax({
+				url: "/schedule/calcountajax",
+				method: "get",
+				data: {"yyyyMMdd": yyyyMMdd},
+				dataType: "json",
+				async: false,
+				success: function(data) {
+					aDate.after("<div class='cp'>" + data.count + "</div>");
+				},
+				error: function() {
+					alert("통신 실패");
+				}
+			});
+		}, function() {
+			$(".cp").remove();
+		});
+	});
+</script>
+<style type="text/css">
+	body {
+		font-family: 'Arial', sans-serif;
+		  background-color: #f8f9fa; /* Light background color */
+		margin: 0;
+		padding: 0;
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+
+	#container {
+		width: 90%;
+		max-width: 1200px;
+		margin: 30px auto;
+		background-color: #fff;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		padding: 20px;
+		border-radius: 10px;
+	}
+
+	h1 {
+		font-size: 24px;
+		text-align: center;
+		color: #5b3c88; /* 진한 보라색 */
+		margin-bottom: 20px;
+	}
+
+	.cal {
+		width: 100%;
+	}
+
+	#ctitle {
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	#ctitle a {
+		color: #8a2be2; /* 보라색 */
+		text-decoration: none;
+		font-size: 20px;
+		margin: 0 10px;
+	}
+
+	#ctitle a:hover {
+		color: #6a1b9a; /* 더 진한 보라색 */
+	}
+
+	#ctitle span {
+		font-size: 22px;
+		color: #5b3c88;
+	}
+
+	#thead {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		text-align: center;
+		font-weight: bold;
+		background-color: #e3d1ff;
+		border-bottom: 2px solid #b39ddb;
+		width: 100%;
+		box-sizing: border-box;
+		min-width: 700px;
+	}
+
+	#thead div {
+		padding: 10px 0;
+		background-color: #d1c4e9;
+		border: 1px solid #b39ddb;
+		color: #4a148c; /* 진한 보라색 텍스트 */
+	}
+
+	#tbody {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 5px;
+		width: 100%;
+		box-sizing: border-box;
+		min-width: 700px;
+	}
+
+	#tbody div {
+		position: relative;
+		padding: 10px 0;
+		text-align: center;
+		background-color: #f3e5f5;
+		border: 1px solid #b39ddb;
+		border-radius: 5px;
+	}
+
+	#tbody .d {
+		display: block;
+		color: #4a148c;
+		font-size: 16px;
+		text-decoration: none;
+	}
+
+	#tbody .pen {
+		width: 18px;
+		height: 18px;
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		cursor: pointer;
+	}
+
+	.cp {
+		position: absolute;
+		left: 50%;
+		top: -25px;
+		transform: translateX(-50%);
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background-color: #8e24aa;
+		color: white;
+		line-height: 30px;
+		text-align: center;
+		font-weight: bold;
+		font-size: 14px;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		z-index: 10;
+		transition: all 0.3s ease;
+	}
+
+	.cp:hover {
+		background-color: #6a1b9a;
+		transform: translateX(-50%) translateY(-5px);
+	}
+</style>
+</head>
+<body>
+<div layout:fragment="content" >
+	<div id="container">
+		<h1> < 환자면담일지 > </h1>
+		<div class="cal">
+			<div id="ctitle">
+				<a th:href="@{/schedule/calendar(year=${calMap.year-1},month=${calMap.month})}">◁</a>
+				<a th:href="@{/schedule/calendar(year=${calMap.year},month=${calMap.month-1})}">◀</a>
+				<span class="y" th:text="${calMap.year}"></span>
+				<span>년</span>
+				<span class="m" th:text="${calMap.month}"></span>
+				<span>월</span>
+				<a th:href="@{/schedule/calendar(year=${calMap.year},month=${calMap.month+1})}">▶</a>
+				<a th:href="@{/schedule/calendar(year=${calMap.year+1},month=${calMap.month})}">▷</a>
+			</div>
+			<div id="thead">
+				<div>일</div><div>월</div><div>화</div><div>수</div>
+				<div>목</div><div>금</div><div>토</div>
+			</div>
+			<div id="tbody">
+				<th:block th:if="${calMap.dayOfWeek>1}">
+					<div th:each="num:${#numbers.sequence(1,calMap.dayOfWeek-1)}">&nbsp;</div>
+				</th:block>
+				<th:block th:each="i:${#numbers.sequence(1,calMap.lastDay)}">
+					<div>
+						<a class="d" th:text="${i}"
+						   th:href="@{/schedule/calboardlist(year=${calMap.year},month=${calMap.month},date=${i})}"></a>
+						<a th:href="@{/schedule/addcalboardform(year=${calMap.year},month=${calMap.month},date=${i})}">
+							<img class="pen" th:src="@{/img/pen.png}" />
+						</a>
+						[(${@util.getCalViewList(i, clist)})]
+					</div>
+				</th:block>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
